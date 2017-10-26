@@ -1,11 +1,14 @@
 import random
 
+from .player import Player
 
-def _tie_breaker(offer1, offer2):
+
+def _tie_breaker(offer1: str, offer2: str) -> (list, list):
     return random.choice([([offer1, offer2], []), ([], [offer1, offer2])])
 
 
-def trade_outcome(offer1, offer2) -> (dict, dict):
+def trade_outcome(offer1: str, offer2: str) -> (list, list):
+    # TODO: This is ugly. Attempt to clean up later.
     if offer1 == 'R':
         if offer2 == 'R':
             return _tie_breaker(offer1, offer2)
@@ -61,3 +64,19 @@ def trade_outcome(offer1, offer2) -> (dict, dict):
             return _tie_breaker(offer1, offer2)
         elif offer2 == 'F':
             return (['W'], [])
+
+
+def trade(player1: Player, player2: Player):
+    p1_offer = player1.take_turn(player2)
+    p2_offer = player2.take_turn(player1)
+    result = trade_outcome(p1_offer, p2_offer)
+    player1.accept_resources(result[0])
+    player2.accept_resources(result[1])
+
+
+def pair_players(players: list) -> list:
+    alive_players = [p for p in players if p.is_alive()]
+    p1 = random.choice(alive_players)
+    alive_players.remove(p1)
+    p2 = random.choice(alive_players)
+    return (p1, p2)
