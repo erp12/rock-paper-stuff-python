@@ -8,8 +8,11 @@ from .util import deviance
 class Player(ABC):
 
     def __init__(self, name):
-        self.inventory = {'R': 0, 'P': 0, 'S': 0, 'F': 0, 'W': 0}
         self.name = name
+        self.reset()
+
+    def reset(self):
+        self.inventory = {'R': 0, 'P': 0, 'S': 0, 'F': 0, 'W': 0}
 
     def is_alive(self):
         for resource in self.inventory:
@@ -56,13 +59,20 @@ class RandomPlayer(Player):
         return random.choice(options)
 
 
-class UserPlayer(Player):
+class SimplePlayer(Player):
 
     def __init__(self, name):
         super().__init__(name)
 
     def strategy(self, other_player):
-        ...
+        most_held = None
+        n_most_held = 0
+        for resource in self.inventory.keys():
+            n_held = self.inventory[resource]
+            if n_held > 0 and n_held > n_most_held:
+                most_held = resource
+                n_most_held = n_held
+        return most_held
 
 
 class UserDefinedPlayer(Player):
@@ -75,3 +85,12 @@ class UserDefinedPlayer(Player):
         return self.strategy_function(self.inventory,
                                       self.other_player.inventory,
                                       self.other_player.name)
+
+
+class UserPlayer(Player):
+
+    def __init__(self, name):
+        super().__init__(name)
+
+    def strategy(self, other_player):
+        ...
